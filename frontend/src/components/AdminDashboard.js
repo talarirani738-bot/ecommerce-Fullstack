@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -19,6 +20,7 @@ const AdminDashboard = () => {
             setLoading(false);
         } catch (error) {
             console.error('Error fetching dashboard:', error);
+            toast.error('Failed to load dashboard');
             setLoading(false);
         }
     };

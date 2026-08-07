@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -18,6 +20,7 @@ const Orders = () => {
             setLoading(false);
         } catch (error) {
             console.error('Error fetching orders:', error);
+            toast.error('Failed to load orders');
             setLoading(false);
         }
     };

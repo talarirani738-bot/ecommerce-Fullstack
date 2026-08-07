@@ -2,35 +2,50 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
+import { validateRegister } from '../utils/validation';
 
 const Register = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
+        confirmPassword: '',
         phone: ''
     });
-    const [error, setError] = useState('');
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const { register } = useAuth();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+        setErrors({ ...errors, [name]: '' });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+        
+        // Validate form
+        const validationErrors = validateRegister(formData);
+        setErrors(validationErrors);
+        
+        if (Object.keys(validationErrors).length > 0) {
+            Object.values(validationErrors).forEach(err => toast.error(err));
+            return;
+        }
+        
         setLoading(true);
-
-        const result = await register(formData);
+        const { confirmPassword, ...registerData } = formData;
+        const result = await register(registerData);
         setLoading(false);
 
         if (result.success) {
+            toast.success('Account created successfully! 🎉');
             navigate('/');
         } else {
-            setError(result.error);
+            toast.error(result.error || 'Registration failed');
         }
     };
 
@@ -38,7 +53,6 @@ const Register = () => {
         <div className='auth-container'>
             <div className='auth-card'>
                 <h2>Register</h2>
-                {error && <div className='error-message'>{error}</div>}
                 <form onSubmit={handleSubmit}>
                     <div className='form-group'>
                         <label>Name</label>
@@ -47,9 +61,9 @@ const Register = () => {
                             name='name'
                             value={formData.name}
                             onChange={handleChange}
-                            required
-                            className='form-input'
+                            className={'form-input' + (errors.name ? ' error' : '')}
                         />
+                        {errors.name && <small className='error-text'>{errors.name}</small>}
                     </div>
                     <div className='form-group'>
                         <label>Email</label>
@@ -58,9 +72,9 @@ const Register = () => {
                             name='email'
                             value={formData.email}
                             onChange={handleChange}
-                            required
-                            className='form-input'
+                            className={'form-input' + (errors.email ? ' error' : '')}
                         />
+                        {errors.email && <small className='error-text'>{errors.email}</small>}
                     </div>
                     <div className='form-group'>
                         <label>Password</label>
@@ -69,13 +83,23 @@ const Register = () => {
                             name='password'
                             value={formData.password}
                             onChange={handleChange}
-                            required
-                            minLength='6'
-                            className='form-input'
+                            className={'form-input' + (errors.password ? ' error' : '')}
                         />
+                        {errors.password && <small className='error-text'>{errors.password}</small>}
                     </div>
                     <div className='form-group'>
-                        <label>Phone</label>
+                        <label>Confirm Password</label>
+                        <input
+                            type='password'
+                            name='confirmPassword'
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            className={'form-input' + (errors.confirmPassword ? ' error' : '')}
+                        />
+                        {errors.confirmPassword && <small className='error-text'>{errors.confirmPassword}</small>}
+                    </div>
+                    <div className='form-group'>
+                        <label>Phone (Optional)</label>
                         <input
                             type='tel'
                             name='phone'

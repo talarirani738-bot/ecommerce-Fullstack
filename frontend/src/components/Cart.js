@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -26,6 +28,7 @@ const Cart = () => {
             setLoading(false);
         } catch (error) {
             console.error('Error fetching cart:', error);
+            toast.error('Failed to load cart');
             setLoading(false);
         }
     };
@@ -34,8 +37,9 @@ const Cart = () => {
         try {
             await axios.delete(API_URL + '/cart/' + productId);
             await fetchCart();
+            toast.success('Item removed from cart');
         } catch (error) {
-            alert('Error removing item from cart');
+            toast.error('Error removing item from cart');
         }
     };
 
@@ -45,7 +49,7 @@ const Cart = () => {
             await axios.put(API_URL + '/cart/' + productId, { quantity });
             await fetchCart();
         } catch (error) {
-            alert('Error updating quantity');
+            toast.error('Error updating quantity');
         }
     };
 
@@ -59,10 +63,10 @@ const Cart = () => {
                 country: 'India'
             };
             await axios.post(API_URL + '/orders', { shippingAddress, paymentMethod: 'card' });
-            alert('Order placed successfully!');
+            toast.success('Order placed successfully! 🎉');
             navigate('/orders');
         } catch (error) {
-            alert(error.response?.data?.message || 'Error placing order');
+            toast.error(error.response?.data?.message || 'Error placing order');
         }
     };
 

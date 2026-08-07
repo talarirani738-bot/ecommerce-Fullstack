@@ -17,7 +17,10 @@ const Navbar = () => {
                             <Link to='/cart' className='nav-link'>🛒 Cart</Link>
                             <Link to='/orders' className='nav-link'>📦 Orders</Link>
                             {user?.role === 'admin' && (
-                                <Link to='/admin' className='nav-link'>📊 Admin</Link>
+                                <>
+                                    <Link to='/admin' className='nav-link'>📊 Dashboard</Link>
+                                    <Link to='/admin/products' className='nav-link'>📦 Manage Products</Link>
+                                </>
                             )}
                         </>
                     )}

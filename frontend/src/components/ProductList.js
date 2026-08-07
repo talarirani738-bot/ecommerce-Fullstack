@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -14,13 +16,10 @@ const ProductList = () => {
     const [totalPages, setTotalPages] = useState(1);
     const { token } = useAuth();
 
-    useEffect(() => {
-        fetchCategories();
-    }, []);
-
-    useEffect(() => {
-        fetchProducts();
-    }, [search, category, page]);
+    uuseEffect(() => {
+    fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [search, category, page]);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -35,9 +34,15 @@ const ProductList = () => {
             setLoading(false);
         } catch (error) {
             console.error('Error fetching products:', error);
+            if (toast.error) toast.error('Failed to load products');
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchProducts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search, category, page]);
 
     const fetchCategories = async () => {
         try {
@@ -50,14 +55,14 @@ const ProductList = () => {
 
     const addToCart = async (productId) => {
         if (!token) {
-            alert('Please login first!');
+            if (toast.warning) toast.warning('Please login first!');
             return;
         }
         try {
             await axios.post(API_URL + '/cart', { productId, quantity: 1 });
-            alert('Item added to cart!');
+            if (toast.success) toast.success('Item added to cart! 🛒');
         } catch (error) {
-            alert(error.response?.data?.message || 'Error adding to cart');
+            if (toast.error) toast.error(error.response?.data?.message || 'Error adding to cart');
         }
     };
 
